@@ -1,26 +1,165 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="container">
+    <Header title="Task Tracker" />
+    <Tasks
+      @toggle-reminder="toggleReminder"
+      @delete-task="deleteTask"
+      :tasks="tasks"
+    />
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Header from "./components/Header";
+import Tasks from "./components/Tasks";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    HelloWorld
-  }
-}
+    Header,
+    Tasks,
+  },
+
+  data() {
+    return {
+      tasks: [
+        {
+          id: 1,
+          text: "Doctors appointment",
+          day: "March 1st at 02:30pm",
+          reminder: true,
+        },
+        {
+          id: 2,
+          text: "School meeting",
+          day: "April 2st at 02:30pm",
+          reminder: false,
+        },
+        {
+          id: 3,
+          text: "Live man city match",
+          day: "Feb 15tt at 22:00pm",
+          reminder: true,
+        },
+      ],
+    };
+  },
+
+  methods: {
+    deleteTask(id) {
+      if (confirm("Are u sure ?")) {
+        this.tasks = this.tasks.filter((task) => task.id !== id);
+      }
+    },
+
+    toggleReminder(id) {
+      this.tasks = this.tasks.map((task) =>
+        task.id === id ? { ...task, reminder: !task.reminder } : task
+      );
+    },
+  },
+
+  created() {
+    this.data = [
+      {
+        id: 1,
+        text: "Doctors appointment",
+        day: "March 1st at 02:30pm",
+        reminder: true,
+      },
+      {
+        id: 1,
+        text: "School meeting",
+        day: "April 2st at 02:30pm",
+        reminder: false,
+      },
+      {
+        id: 3,
+        text: "Live man city match",
+        day: "Feb 15tt at 22:00pm",
+        reminder: true,
+      },
+    ];
+  },
+};
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+* {
+  margin: 0;
+  font-family: "Satoshi", sans-serif;
+}
+html,
+body {
+  height: 100%;
+}
+body {
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+}
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+#root,
+#__next {
+  isolation: isolate;
+}
+
+.container {
+  max-width: 500px;
+  margin: 30px auto;
+  overflow: auto;
+  min-height: 300px;
+  border: 1px solid steelblue;
+  padding: 30px;
+  border-radius: 5px;
+}
+.btn {
+  display: inline-block;
+  background: #000;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  margin: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 15px;
+  font-family: inherit;
+}
+.btn:focus {
+  outline: none;
+}
+.btn:active {
+  transform: scale(0.98);
+}
+.btn-block {
+  display: block;
+  width: 100%;
 }
 </style>
