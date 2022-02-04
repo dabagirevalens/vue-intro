@@ -1,0 +1,14 @@
+<template>
+    <h3>Version 1.0.1</h3>
+    <router-link to='/'> Go back </router-link>
+</template>
+
+<script>
+    export default {
+        
+    }
+</script>
+
+<style lang="scss" scoped>
+
+</style>
