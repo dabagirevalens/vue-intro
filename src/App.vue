@@ -1,7 +1,13 @@
 <template>
   <div class="container">
-    <Header title="Task Tracker" />
-    <AddTask @add-task='addTask' />
+    <Header
+      @toggle-add-task="toggleAddTask"
+      :showAddTask="showAddTask"
+      title="Task Tracker"
+    />
+    <div v-show="showAddTask">
+      <AddTask @add-task="addTask" />
+    </div>
     <Tasks
       @toggle-reminder="toggleReminder"
       @delete-task="deleteTask"
@@ -25,69 +31,80 @@ export default {
 
   data() {
     return {
-      tasks: [
-        {
-          id: 1,
-          text: "Doctors appointment",
-          day: "March 1st at 02:30pm",
-          reminder: true,
-        },
-        {
-          id: 2,
-          text: "School meeting",
-          day: "April 2st at 02:30pm",
-          reminder: false,
-        },
-        {
-          id: 3,
-          text: "Live man city match",
-          day: "Feb 15tt at 22:00pm",
-          reminder: true,
-        },
-      ],
+      tasks: [],
+      showAddTask: false,
     };
   },
 
   methods: {
+    async addTask(task) {
+      const res = await fetch("api/tasks", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify(task),
+      });
 
-    addTask(task){
-      this.tasks = [...this.tasks, task]
+      const data = await res.json();
+
+      this.tasks = [...this.tasks, data];
     },
 
-    deleteTask(id) {
+    toggleAddTask() {
+      this.showAddTask = !this.showAddTask;
+    },
+
+    async deleteTask(id) {
       if (confirm("Are u sure ?")) {
-        this.tasks = this.tasks.filter((task) => task.id !== id);
+        const res = await fetch(`api/tasks/${id}`, {
+          method: "DELETE",
+        });
+
+        res.status === 2000
+          ? (this.tasks = this.tasks.filter((task) => task.id !== id))
+          : alert("Error while deleting task");
       }
     },
 
-    toggleReminder(id) {
+    async toggleReminder(id) {
+      const taskToToggle = await this.fetchTask(id);
+      const upTask = { ...taskToToggle, reminder: !taskToToggle.reminder };
+
+      const res = await fetch(`api/tasks/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify(upTask),
+      });
+
+      const data = res.json();
+
       this.tasks = this.tasks.map((task) =>
-        task.id === id ? { ...task, reminder: !task.reminder } : task
+        task.id === id ? { ...task, reminder: data.reminder } : task
       );
+    },
+
+    async fetchTasks() {
+      const res = await fetch("api/tasks");
+
+      const data = await res.json();
+
+      return data;
+    },
+
+    async fetchTask(id) {
+      const res = await fetch(`api/tasks/${id}`);
+
+      const data = await res.json();
+
+      return data;
     },
   },
 
-  created() {
-    this.data = [
-      {
-        id: 1,
-        text: "Doctors appointment",
-        day: "March 1st at 02:30pm",
-        reminder: true,
-      },
-      {
-        id: 1,
-        text: "School meeting",
-        day: "April 2st at 02:30pm",
-        reminder: false,
-      },
-      {
-        id: 3,
-        text: "Live man city match",
-        day: "Feb 15tt at 22:00pm",
-        reminder: true,
-      },
-    ];
+  async created() {
+    this.tasks = await this.fetchTasks();
   },
 };
 </script>
